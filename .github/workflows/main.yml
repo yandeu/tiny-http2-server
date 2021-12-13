@@ -39,5 +39,5 @@ jobs:
       # - name: Run ESLint
       #   run: npm run lint
 
-      # - name: Upload coverage to Codecov
-      #   uses: codecov/codecov-action@v2
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2

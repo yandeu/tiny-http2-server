@@ -15,15 +15,22 @@ import { TinyServerHttp, TinyServerHttps, TinyServerHttp2 } from 'tiny-server'
 const server = new TinyServerHttp2() // or TinyServerHttp(), or TinyServerHttps()
 const route = server.route
 
+// classic
 route.use(logger())
 
+// minimal
+route.logger()
+
+// classic
 route.get('/hello', ({ req, res }) => {
   return res.send.text('hello')
 })
 
-server.listen(8443).then(() => {
-  console.log('Server: https://localhost:8443/')
-})
+// minimal
+route.get('/hello', _ => 'hello')
+
+await server.listen(8443)
+console.log('Server: https://localhost:8443/')
 ```
 
 ## Middleware

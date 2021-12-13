@@ -6,6 +6,7 @@ export const sym = () => {
     fail: '✘',
     pass: '✔',
     skip: '⚙'
+    // run: '⠕'
   }
 }
 export const clr = () => {
@@ -35,13 +36,26 @@ export const afterAll = (fnc: Function) => {
 export const describe = (assertion: string, fnc: Function) => {
   tests.push({ assertion, fnc })
 }
-export const expect = (t1: any) => {
+
+export function expect(t1: any): {
+  toBe: (t2: any) => void
+}
+export function expect(
+  description: string,
+  t1: any
+): {
+  toBe: (t2: any) => void
+}
+export function expect(a: any | string, b?: any) {
+  const t1 = b || a
+  const description = b ? a : `Should be "${t1}"`
+
   return {
     toBe: t2 => {
       const isTrue = t1 === t2
-      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass}`), clr().gray(`"${t1}" is "${t2}"`))
+      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass}`), clr().gray(`${description}, got "${t2}"`))
       else {
-        const error = clr().red(`  ${sym().fail} "${t1}" is NOT "${t2}"`)
+        const error = clr().red(`  ${sym().fail} ${description}, got "${t2}"`)
         console.log(error)
         errors.push(error)
       }
@@ -60,10 +74,10 @@ export const test = async (config: TestConfig = {}) => {
   for (const t of tests) {
     try {
       console.log('\n')
-      console.log('-', t.assertion)
+      console.log(clr().gray(`- ${t.assertion}`))
       await Promise.race([t.fnc(), pause(timeout, true)])
     } catch (err: any) {
-      console.log('Error in Test:', err)
+      console.log(clr().red(` ${sym().fail} Error in Test::`), err)
       errors.push(err)
     }
   }

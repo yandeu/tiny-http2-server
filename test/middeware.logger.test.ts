@@ -18,8 +18,8 @@ describe('Logger', async () => {
   await nodeFetch(`http://localhost:${port}/`)
   await nodeFetch(`http://localhost:${port}/api/posts/558`)
 
-  expect(logs.includes('GET /')).toBe(true)
-  expect(logs.includes('GET /api/posts/558')).toBe(true)
+  expect('Request to "/" should be "GET /"', logs.includes('GET /')).toBe(true)
+  expect('Should log "GET /api/posts/558"', logs.includes('GET /api/posts/558')).toBe(true)
 
   await server.close()
 })

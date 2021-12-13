@@ -32,9 +32,9 @@ describe('File', async () => {
 
 describe('Html', async () => {
   const { body } = await nodeFetch(toUrl('/html'))
-  expect(/^<!DOCTYPE html>/gm.test(body)).toBe(true)
-  expect(/<h1>Hello<\/h1>/gm.test(body)).toBe(true)
-  expect(/<\/body>$/gm.test(body)).toBe(true)
+  expect('Html should in include DOCTYPE', /^<!DOCTYPE html>/gm.test(body)).toBe(true)
+  expect('<h1>Hello</h1> should be inside Html file', /<h1>Hello<\/h1>/gm.test(body)).toBe(true)
+  expect('Last part of HTML should be closing </body>', /<\/body>$/gm.test(body)).toBe(true)
 })
 describe('Json', async () => {
   const { body } = await nodeFetch(toUrl('/json'))

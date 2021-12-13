@@ -20,8 +20,6 @@ describe('Static (no regex)', async () => {
   server.route.static(/^(static|www)/, join(resolve(), 'test/data'))
   server.route.get('/static/text.txt', _ => 'ok')
 
-  console.log(/^(static|www)/ instanceof RegExp)
-
   const port = await server.listen()
   const { body, headers } = await nodeFetch(`http://localhost:${port}/static/text.txt`)
 

@@ -1,16 +1,29 @@
 {
-  "name": "tinyserver",
+  "name": "tiny-http2-server",
   "version": "1.0.0",
   "description": "A tiny wrapper around http.createServer() for e2e testing.",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "type": "commonjs",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npm run dev",
+    "dev": "npm run clean && npm run build && npm-run-all --parallel dev:*",
+    "dev:tsc": "tsc --watch",
+    "dev:nodemon": "nodemon lib/dev.js --delay 200ms",
+    "build": "tsc",
+    "test": "nyc --clean --reporter none node scripts/test.mjs",
+    "coverage": "nyc  report --include src --reporter text --reporter html --reporter lcov",
+    "clean": "rimraf lib .nyc_output coverage test/**.js test/**.mjs",
+    "postinstallOnly": "npm run clean && npm run build"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Yannick Deubel",
+  "license": "MIT",
   "devDependencies": {
     "@types/node": "^16.11.11",
-    "typescript": "^4.5.2"
+    "npm-run-all": "^4.1.5",
+    "nyc": "^15.1.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.6.0-dev.20211211"
   }
 }

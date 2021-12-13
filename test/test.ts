@@ -39,7 +39,7 @@ export const expect = (t1: any) => {
   return {
     toBe: t2 => {
       const isTrue = t1 === t2
-      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass} `), clr().gray(`"${t1}" is "${t2}"`))
+      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass}`), clr().gray(`"${t1}" is "${t2}"`))
       else {
         const error = clr().red(`  ${sym().fail} "${t1}" is NOT "${t2}"`)
         console.log(error)

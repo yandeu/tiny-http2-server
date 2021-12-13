@@ -15,6 +15,8 @@ export const fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
 // https://github.com/nginx/nginx/blob/master/conf/mime.types
 export const mime = (fileName: string) => {
   switch (extname(fileName)) {
+    case '.txt':
+      return 'text/plain'
     case '.css':
       return 'text/css'
     case '.js':

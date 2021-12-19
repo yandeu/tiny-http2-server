@@ -30,6 +30,9 @@ class ResponseBase {
       json: (json: object) => {
         this.__send(JSON.stringify(json), 'application/json')
       },
+      status: (status: number) => {
+        this.send.text(status.toString())
+      },
       /**
        * Send a file.
        * Pass a relativePath (without leading slash) or an absolute path

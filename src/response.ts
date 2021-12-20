@@ -21,8 +21,8 @@ class ResponseBase {
 
   public get send() {
     return {
-      html: (html: string) => {
-        this.__send(makeHtml(html), 'text/html')
+      html: (html: string, addDoctype = false) => {
+        this.__send(addDoctype ? makeHtml(html) : html, 'text/html')
       },
       text: (text: string) => {
         this.__send(text, 'text/plain')

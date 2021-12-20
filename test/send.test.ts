@@ -8,7 +8,7 @@ server.route.get('/file', ({ req, res }) => {
   return res.send.file('test/data/text.txt')
 })
 server.route.get('/html', ({ req, res }) => {
-  res.send.html('<h1>Hello</h1>')
+  res.send.html('<h1>Hello</h1>', true)
 })
 server.route.get('/json', ({ req, res }) => {
   res.send.json({ msg: 'hello' })

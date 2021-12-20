@@ -66,6 +66,7 @@ export class Router {
       const route = this._routes[i]
       const url = req.url as string
 
+      const pathIsAsterisk = typeof route !== 'function' && route.path === '*'
       const pathIsRegex = typeof route !== 'function' && route.path instanceof RegExp // && url.match(route.path) !== null
       const pathIsExact = typeof route !== 'function' && route.path === req.url
       const pathMatches = typeof route !== 'function' && typeof route.path === 'string' && url.startsWith(route.path)
@@ -80,7 +81,7 @@ export class Router {
 
         // is middleware
         if (route.isMiddleware) {
-          if (pathMatches || pathIsExact || pathIsRegex) {
+          if (pathIsAsterisk || pathMatches || pathIsExact || pathIsRegex) {
             const next = (err?: any) => {} // console.log('FROM NEXT', err)
             const handle = (route.handler as ExpressHandler)(req, res, next)
             if (isPromise(handle))
@@ -93,7 +94,7 @@ export class Router {
         }
 
         // is route
-        else if (pathIsExact || pathIsRegex) {
+        else if (pathIsAsterisk || pathIsExact || pathIsRegex) {
           // get all regex capture groups and pass them as params to req.params
           if (pathIsRegex) {
             //const array = [...req.url.matchAll(route.path as RegExp)]

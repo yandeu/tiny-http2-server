@@ -97,7 +97,11 @@ export class Router {
           // get all regex capture groups and pass them as params to req.params
           if (pathIsRegex) {
             //const array = [...req.url.matchAll(route.path as RegExp)]
-            const matches = req.url.matchAll(route.path as RegExp)
+            const matchesIterator = req.url.matchAll(route.path as RegExp)
+            const matches = Array.from(matchesIterator)
+
+            if (matches.length === 0) continue
+
             for (const match of matches) {
               req.params = { ...match.groups }
             }

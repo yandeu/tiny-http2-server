@@ -2,7 +2,7 @@ import { Request, RequestHttp2 } from '../request'
 import { ExpressHandler, NextFunction, Response } from '../types'
 
 /** Parses body and adds content to req.body */
-const parseBody = async (req: Request | RequestHttp2): Promise<void> =>
+const parse = async (req: Request | RequestHttp2): Promise<Buffer | string> =>
   new Promise((resolve, reject) => {
     let buffers: Buffer[] = []
     let string: string = ''
@@ -17,8 +17,7 @@ const parseBody = async (req: Request | RequestHttp2): Promise<void> =>
       })
       .on('end', () => {
         const data = buffers.length > 0 ? Buffer.concat(buffers) : string
-        req.body = data
-        return resolve()
+        return resolve(data)
       })
       .on('error', () => {
         return reject()
@@ -26,20 +25,22 @@ const parseBody = async (req: Request | RequestHttp2): Promise<void> =>
   })
 
 export const bodyParser = {
+  parse: parse,
   /** Parse json and text. */
-  json: () =>
+  json: (text = true) =>
     (async (req: Request, res: Response, next: NextFunction) => {
-      await parseBody(req)
-
-      // isJSON
+      // is json or text
       const isJSON = req.headers['content-type'] === 'application/json'
-      const isText = req.headers['content-type']?.startsWith('text/')
+      const isText = text && req.headers['content-type']?.startsWith('text/')
       if (!isJSON && !isText) return next()
+
+      // parse
+      const body = await parse(req)
 
       // replace body with json
       try {
         // to string
-        const string = (req.body as Buffer | string).toString()
+        const string = (body as Buffer | string).toString()
         req.body = string
         // to json
         if (isJSON) {

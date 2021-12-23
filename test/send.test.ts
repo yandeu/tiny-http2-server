@@ -16,6 +16,12 @@ server.route.get('/json', ({ req, res }) => {
 server.route.get('/text', ({ req, res }) => {
   res.send.text('Simple Text')
 })
+server.route.get('/status', ({ req, res }) => {
+  res.send.status(200)
+})
+server.route.get('/444', ({ req, res }) => {
+  res.send.status(444)
+})
 
 let toUrl: (path: string) => string
 
@@ -45,6 +51,14 @@ describe('Json', async () => {
 describe('Text', async () => {
   const { body } = await nodeFetch(toUrl('/text'))
   expect(body).toBe('Simple Text')
+})
+describe('Status', async () => {
+  const { body } = await nodeFetch(toUrl('/status'))
+  expect(body).toBe('OK')
+})
+describe('444', async () => {
+  const { body } = await nodeFetch(toUrl('/444'))
+  expect(body).toBe('')
 })
 
 afterAll(async () => {

@@ -1,7 +1,7 @@
 import { createReadStream } from 'fs'
 import { OutgoingMessage, ServerResponse } from 'http'
 import { stat } from 'fs/promises'
-import { makeHtml, mime } from './helpers'
+import { makeHtml, mime, statusCode } from './helpers'
 import { Http2ServerResponse } from 'http2'
 
 class ResponseBase {
@@ -31,7 +31,14 @@ class ResponseBase {
         this.__send(JSON.stringify(json), 'application/json')
       },
       status: (status: number) => {
-        this.send.text(status.toString())
+        // end without sending anything (just like nginx)
+        if (status === 444) {
+          this.status(444)
+          // @ts-expect-error
+          this.end()
+        } else {
+          this.status(status).send.text(statusCode(status))
+        }
       },
       /**
        * Send a file.

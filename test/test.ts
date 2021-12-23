@@ -47,15 +47,14 @@ export function expect(
   toBe: (t2: any) => void
 }
 export function expect(a: any | string, b?: any) {
-  const t1 = b || a
-  const description = b ? a : `Should be "${t1}"`
-
   return {
     toBe: t2 => {
+      const t1 = b || a
       const isTrue = t1 === t2
-      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass}`), clr().gray(`${description}, got "${t2}"`))
+      const description = b ? a : `Should be "${t2}"`
+      if (isTrue) console.log(clr().lightGreen(`  ${sym().pass}`), clr().gray(`${description}, got "${t1}"`))
       else {
-        const error = clr().red(`  ${sym().fail} ${description}, got "${t2}"`)
+        const error = clr().red(`  ${sym().fail} ${description}, got "${t1}"`)
         console.log(error)
         errors.push(error)
       }

@@ -8,7 +8,7 @@ import { Stream } from './stream'
 
 import { Router } from './router'
 import { serveStatic } from './middleware/serveStatic'
-import { AddressInfo, Socket } from 'net'
+import { createServer, AddressInfo, Socket } from 'net'
 
 type Port = number
 
@@ -37,20 +37,45 @@ export abstract class TinyServerBase<
 
   protected abstract createServer(): Srv
 
-  randomPort = () => {
-    return Math.floor(Math.random() * (65535 - 1024) + 1024)
+  portIsFree(port: Port): Promise<boolean> {
+    return new Promise(resolve => {
+      const server = createServer(function (socket) {
+        socket.write('Echo server\r\n')
+        socket.pipe(socket)
+      })
+      server.on('error', function () {
+        resolve(false)
+      })
+      server.on('listening', function () {
+        server.close()
+        resolve(true)
+      })
+      server.listen(port, '127.0.0.1')
+    })
   }
 
-  public listen(port: Port = this.randomPort()): Promise<Port> {
+  async randomPort(): Promise<Port> {
+    const port = Math.floor(Math.random() * (65535 - 1024) + 1024)
+    if (await !this.portIsFree(port)) return this.randomPort()
+    else return port
+  }
+
+  randomId() {
+    return Math.random().toString(32).substring(2) + '-' + Math.random().toString(32).substring(2)
+  }
+
+  public listen(port: Port = 0): Promise<Port> {
     return new Promise(resolve => {
       this.server = this.createServer() as Srv
 
       this.server.on('connection', socket => {
-        const randomId = Math.random().toString(32).substring(2) + '-' + Math.random().toString(32).substring(2)
-        this.sockets.set(randomId, socket)
-        socket.on('close', () => {
-          this.sockets.delete(randomId)
-        })
+        const randomId = this.randomId()
+        if (!this.sockets.has(randomId)) {
+          this.sockets.set(randomId, socket)
+          socket.on('close', () => {
+            this.sockets.delete(randomId)
+          })
+        }
       })
 
       this.server.listen(port, () => {

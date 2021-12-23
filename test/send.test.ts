@@ -3,7 +3,7 @@ import { nodeFetch } from '../scripts/nodeFetch.js'
 import { describe, expect, test, errors, beforeAll, afterAll } from './test.mjs'
 
 const server = new TinyServerHttp()
-const port = server.randomPort()
+
 server.route.get('/file', ({ req, res }) => {
   return res.send.file('test/data/text.txt')
 })
@@ -17,12 +17,14 @@ server.route.get('/text', ({ req, res }) => {
   res.send.text('Simple Text')
 })
 
-const toUrl = (path: string) => {
-  return `http://localhost:${port}${path}`
-}
+let toUrl: (path: string) => string
 
 beforeAll(async () => {
+  const port = await server.randomPort()
   await server.listen(port)
+  toUrl = (path: string) => {
+    return `http://localhost:${port}${path}`
+  }
 })
 
 describe('File', async () => {

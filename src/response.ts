@@ -4,7 +4,7 @@ import { stat } from 'fs/promises'
 import { makeHtml, mime, statusCode } from './helpers'
 import { Http2ServerResponse } from 'http2'
 
-class ResponseBase {
+export class ResponseBase {
   statusCode!: number
 
   public status(statusCode: number) {
@@ -12,7 +12,7 @@ class ResponseBase {
     return this
   }
 
-  __send(body: string, contentType = 'text/plain') {
+  protected __send(body: string, contentType = 'text/plain') {
     // @ts-ignore
     this.writeHead(this.statusCode || 200, { 'Content-Type': contentType })
     // @ts-ignore

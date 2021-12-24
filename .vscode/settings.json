@@ -3,7 +3,5 @@
     "src/**/*.js":true,
     "test/**/*.js":true,
     "test/**/*.mjs":true,  
-    "test/**/*.d.ts":true,  
-    "lib": true,
-    "package-lock.json": true
+    "test/**/*.d.ts":true
 }

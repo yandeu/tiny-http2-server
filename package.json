@@ -1,7 +1,7 @@
 {
   "name": "tiny-http2-server",
-  "version": "1.0.0",
-  "description": "A tiny wrapper around http.createServer() for e2e testing.",
+  "version": "0.0.0",
+  "description": "A tiny http/https/http2 server.",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "type": "commonjs",
@@ -14,11 +14,12 @@
     "test": "nyc --clean --reporter none node scripts/test.mjs",
     "coverage": "nyc  report --include src --reporter text --reporter html --reporter lcov",
     "clean": "rimraf lib .nyc_output coverage test/**.js test/**.mjs",
-    "postinstallOnly": "npm run clean && npm run build"
+    "postinstallOnly": "npm run clean && npm run build",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [],
-  "author": "Yannick Deubel",
-  "license": "MIT",
+  "author": "Yannick Deubel (https://github.com/yandeu)",
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "@types/node": "^16.11.11",
     "npm-run-all": "^4.1.5",

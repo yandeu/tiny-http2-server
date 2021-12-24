@@ -1,8 +1,11 @@
-# TinyServer-HTTP2
+# Tiny HTTP2 Server
 
 `tiny-http2-server`
 
-A tiny (dependency less) wrapper around Node's http/http2.
+A tiny wrapper around Node's http/http2.
+
+[![codecov](https://codecov.io/gh/yandeu/tiny-http2-server/branch/main/graph/badge.svg)](https://app.codecov.io/gh/yandeu/tiny-http2-server)
+[![Known Vulnerabilities](https://snyk.io/test/github/yandeu/tiny-http2-server/badge.svg)](https://snyk.io/test/github/yandeu/tiny-http2-server)
 
 ## Getting Started
 
@@ -45,9 +48,3 @@ See: [./src/middleware](https://github.com/yandeu/tiny-http2-server/tree/main/sr
 openssl req -x509 -newkey rsa:2048 -nodes -sha256 -days 3560 -subj '/CN=localhost' \
  -keyout cert/localhost-privkey.pem -out cert/localhost-cert.pem
 ```
-
-## Express Compatibility
-
-Works with:
-
-- [cors](https://www.npmjs.com/package/cors)

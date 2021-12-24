@@ -41,10 +41,11 @@ const httpRequest = async (url, config = {}) =>
           })
           .on('end', () => {
             try {
-              const json = JSON.parse(data)
-              return resolve({ body: json, rawHeaders: res.rawHeaders, headers: res.headers })
+              let json = JSON.parse(data)
+              if (typeof json === 'number') json = json.toString()
+              return resolve({ body: json, status: res.statusCode, rawHeaders: res.rawHeaders, headers: res.headers })
             } catch (error) {
-              return resolve({ body: data, rawHeaders: res.rawHeaders, headers: res.headers })
+              return resolve({ body: data, status: res.statusCode, rawHeaders: res.rawHeaders, headers: res.headers })
             }
           })
       }

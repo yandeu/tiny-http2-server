@@ -16,11 +16,17 @@ server.route.get('/json', ({ req, res }) => {
 server.route.get('/text', ({ req, res }) => {
   res.send.text('Simple Text')
 })
-server.route.get('/status', ({ req, res }) => {
+server.route.get('/status/200', ({ req, res }) => {
   res.send.status(200)
 })
-server.route.get('/444', ({ req, res }) => {
+server.route.get('/status/404', ({ req, res }) => {
+  res.send.status(404)
+})
+server.route.get('/status/444', ({ req, res }) => {
   res.send.status(444)
+})
+server.route.get('/status/499', ({ req, res }) => {
+  res.send.status(499)
 })
 
 let toUrl: (path: string) => string
@@ -52,13 +58,25 @@ describe('Text', async () => {
   const { body } = await nodeFetch(toUrl('/text'))
   expect(body).toBe('Simple Text')
 })
-describe('Status', async () => {
-  const { body } = await nodeFetch(toUrl('/status'))
+describe('Status 200', async () => {
+  const { body, status } = await nodeFetch(toUrl('/status/200'))
+  expect(status).toBe(200)
   expect(body).toBe('OK')
 })
-describe('444', async () => {
-  const { body } = await nodeFetch(toUrl('/444'))
+describe('Status 404', async () => {
+  const { body, status } = await nodeFetch(toUrl('/status/404'))
+  expect(status).toBe(404)
+  expect(body).toBe('Not Found')
+})
+describe('Status 444', async () => {
+  const { body, status } = await nodeFetch(toUrl('/status/444'))
+  expect(status).toBe(444)
   expect(body).toBe('')
+})
+describe('Status 499', async () => {
+  const { body, status } = await nodeFetch(toUrl('/status/499'))
+  expect(status).toBe(499)
+  expect(body).toBe('499')
 })
 
 afterAll(async () => {

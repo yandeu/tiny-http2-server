@@ -111,7 +111,7 @@ export class Router {
           if (route.method === method || route.method === 'any') {
             const result = await (route.handler as Handler)({ req, res })
             if (typeof result === 'string') return res.send.text(result)
-            // @ts-ignore TODO(yandeu): Add "sendStatus" function
+            // TODO(yandeu): Only use sendStatus() if number is one of status code.
             else if (typeof result === 'number') return res.send.status(result)
             else if (typeof result === 'object') return res.send.json(result)
           }

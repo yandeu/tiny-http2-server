@@ -1,6 +1,7 @@
 import { extname } from 'path'
 import { stat } from 'fs/promises'
 import { types } from 'util'
+import { STATUS_CODES } from 'http'
 
 export const { isPromise } = types
 
@@ -49,60 +50,11 @@ export const escapeHtml = (unsafe: string) => {
   return unsafe
 }
 
-// https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-export const statusCode = (code: number) => {
-  switch (code) {
-    case 200:
-      return 'OK'
-    case 201:
-      return 'Created'
-    case 202:
-      return 'Accepted'
-    case 300:
-      return 'Multiple Choices'
-    case 301:
-      return 'Moved Permanently'
-    case 302:
-      return 'Found'
-    case 307:
-      return 'Temporary Redirect'
-    case 308:
-      return 'Permanent Redirect'
-    case 400:
-      return 'Bad Request'
-    case 401:
-      return 'Unauthorized'
-    case 402:
-      return 'Payment Required'
-    case 403:
-      return 'Forbidden'
-    case 404:
-      return 'Not Found'
-    case 405:
-      return 'Method Not Allowed'
-    case 406:
-      return 'Not Acceptable'
-    case 408:
-      return 'Request Timeout'
-    case 413:
-      return 'Payload Too Large'
-    case 414:
-      return 'URI Too Long'
-    case 415:
-      return 'Unsupported Media Type'
-    case 414:
-      return 'URI Too Long'
-    case 429:
-      return 'Too Many Requests'
-    case 431:
-      return 'Request Header Fields Too Large'
-    case 444:
-      return 'No Response'
-    case 500:
-      return 'Internal Server Error'
-    default:
-      return code.toString()
-  }
+export const statusCode = (code: number): string => {
+  const status = STATUS_CODES[code.toString()]
+  if (status && status.length > 0) return status
+  else if (code === 444) return 'No Response'
+  else return code.toString()
 }
 
 export const makeHtml = (body: string, more: { head?: string[] } = {}) => {

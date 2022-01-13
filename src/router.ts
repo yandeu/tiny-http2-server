@@ -21,17 +21,11 @@ export class Router {
     this._absoluteRoot.replace(/\/+/gm, '/')
     if (this._parent) {
       // TODO(yandeu): Infinite traverse parent router
-      console.log('one')
-      console.log(this._relativeRoot, this._absoluteRoot)
       this._absoluteRoot = this._parent._relativeRoot + this._absoluteRoot
       this._absoluteRoot = this._absoluteRoot.replace(/\/+/gm, '/')
       if (this._parent._parent) {
-        console.log('two')
-        console.log(this._relativeRoot, this._absoluteRoot)
         this._absoluteRoot = this._parent._parent._relativeRoot + this._absoluteRoot
         this._absoluteRoot = this._absoluteRoot.replace(/\/+/gm, '/')
-        console.log('done')
-        console.log(this._relativeRoot, this._absoluteRoot)
       }
     }
 
@@ -55,7 +49,6 @@ export class Router {
     return {
       use: use,
       child: (path: string, router: Router) => {
-        console.log('path', path)
         router._relativeRoot = path
         router._parent = this
         this._children.push(router)
@@ -99,14 +92,10 @@ export class Router {
   }
 
   async handle(req: Request, res: Response) {
-    console.log('root', this._absoluteRoot)
-
     const method = req.method?.toLowerCase() as Method
     let url =
       this._absoluteRoot === '/' ? (req.url as string) : req.url.replace(new RegExp(`^${this._absoluteRoot}`), '')
-
     if (url === '') url = '/'
-    console.log('url', url)
 
     routesLoop: for (let i = 0; i < this._routes.length; i++) {
       if (res.headersSent) break routesLoop
@@ -125,7 +114,6 @@ export class Router {
 
       // is handle without path
       if (typeof route === 'function') {
-        console.log('is handle without path')
         await route({ req, res })
       } else {
         // pass some data to the request

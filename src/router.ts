@@ -5,7 +5,40 @@ import { Response } from './response'
 import type { ExpressHandler, Handler, Method, Path, Route, Routes, UseMiddleware } from './types'
 
 export class Router {
+  /** The root route of this Router */
+  private _relativeRoot = '/'
+  private _absoluteRoot = '/'
+  /** Array of all routes of this Router */
   private _routes: Routes = []
+  /** The children router (if it has some) */
+  private _children: Router[] = []
+  /** The parent router (if it has one) */
+  private _parent!: Router
+
+  /** Traverse all down all children and from there traverse up all parents and adjust the _absoluteRoot */
+  adjustAbsoluteRoot() {
+    this._absoluteRoot = this._relativeRoot
+    this._absoluteRoot.replace(/\/+/gm, '/')
+    if (this._parent) {
+      // TODO(yandeu): Infinite traverse parent router
+      console.log('one')
+      console.log(this._relativeRoot, this._absoluteRoot)
+      this._absoluteRoot = this._parent._relativeRoot + this._absoluteRoot
+      this._absoluteRoot = this._absoluteRoot.replace(/\/+/gm, '/')
+      if (this._parent._parent) {
+        console.log('two')
+        console.log(this._relativeRoot, this._absoluteRoot)
+        this._absoluteRoot = this._parent._parent._relativeRoot + this._absoluteRoot
+        this._absoluteRoot = this._absoluteRoot.replace(/\/+/gm, '/')
+        console.log('done')
+        console.log(this._relativeRoot, this._absoluteRoot)
+      }
+    }
+
+    this._children.forEach(c => {
+      c.adjustAbsoluteRoot()
+    })
+  }
 
   get route() {
     /** Add a middleware */
@@ -21,6 +54,14 @@ export class Router {
 
     return {
       use: use,
+      child: (path: string, router: Router) => {
+        console.log('path', path)
+        router._relativeRoot = path
+        router._parent = this
+        this._children.push(router)
+        this._routes.push(router)
+        this.adjustAbsoluteRoot()
+      },
       // add route
       add: (method: Method, path: Path, handler: Handler) => {
         this.routes.add({ method, path, handler })
@@ -58,21 +99,33 @@ export class Router {
   }
 
   async handle(req: Request, res: Response) {
+    console.log('root', this._absoluteRoot)
+
     const method = req.method?.toLowerCase() as Method
+    let url =
+      this._absoluteRoot === '/' ? (req.url as string) : req.url.replace(new RegExp(`^${this._absoluteRoot}`), '')
+
+    if (url === '') url = '/'
+    console.log('url', url)
 
     routesLoop: for (let i = 0; i < this._routes.length; i++) {
       if (res.headersSent) break routesLoop
 
       const route = this._routes[i]
-      const url = req.url as string
+
+      if (route instanceof Router) {
+        await route.handle(req, res)
+        continue
+      }
 
       const pathIsAsterisk = typeof route !== 'function' && route.path === '*'
       const pathIsRegex = typeof route !== 'function' && route.path instanceof RegExp // && url.match(route.path) !== null
-      const pathIsExact = typeof route !== 'function' && route.path === req.url
+      const pathIsExact = typeof route !== 'function' && route.path === url
       const pathMatches = typeof route !== 'function' && typeof route.path === 'string' && url.startsWith(route.path)
 
       // is handle without path
       if (typeof route === 'function') {
+        console.log('is handle without path')
         await route({ req, res })
       } else {
         // pass some data to the request

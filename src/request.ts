@@ -13,12 +13,22 @@ class Request extends IncomingMessage implements RequestBase {
   route!: Omit<Route, 'handler'>
   url!: string
   body: any
+
+  // TODO(yandeu): untrust proxy by default
+  get ip() {
+    return (this.headers['x-forwarded-for'] as string)?.split(',').shift() || this.socket?.remoteAddress || ''
+  }
 }
 class RequestHttp2 extends Http2ServerRequest implements RequestBase {
   params!: { [param: string]: string }
   route!: Omit<Route, 'handler'>
   url!: string
   body: any
+
+  // TODO(yandeu): untrust proxy by default
+  get ip() {
+    return (this.headers['x-forwarded-for'] as string)?.split(',').shift() || this.socket?.remoteAddress || ''
+  }
 }
 
 interface Request extends RequestBase {}

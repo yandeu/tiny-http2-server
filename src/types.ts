@@ -3,6 +3,7 @@ export type { Http2Server, Http2SecureServer }
 
 import type { Request, RequestHttp2 } from './request'
 import type { Response, ResponseHttp2 } from './response'
+import type { Router } from './router'
 export type { Request, RequestHttp2, Response, ResponseHttp2 }
 
 export type Path = string | RegExp
@@ -26,7 +27,7 @@ export interface Route {
   method?: Method
   isMiddleware?: boolean
 }
-export type Routes = (Route | Handler)[]
+export type Routes = (Route | Handler | Router)[]
 export type UseMiddleware = {
   (handler: ExpressHandler): void
   (path: Path, handler: ExpressHandler): void

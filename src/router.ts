@@ -139,7 +139,7 @@ export class Router {
           // get all regex capture groups and pass them as params to req.params
           if (pathIsRegex) {
             //const array = [...req.url.matchAll(route.path as RegExp)]
-            const matchesIterator = req.url.matchAll(route.path as RegExp)
+            const matchesIterator = url.matchAll(route.path as RegExp)
             const matches = Array.from(matchesIterator)
 
             if (matches.length === 0) continue

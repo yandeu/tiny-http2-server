@@ -41,6 +41,11 @@ console.log('Server: https://localhost:8443/')
 There are some fancy middleware includes.  
 See: [./src/middleware](https://github.com/yandeu/tiny-http2-server/tree/main/src/middleware)
 
+## Testing
+
+To make a automated test use `npm test`.  
+To run a single test, use `npm test -- STRING`
+
 ## Create a simple ssl certificate
 
 ```bash

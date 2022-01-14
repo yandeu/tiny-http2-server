@@ -31,6 +31,11 @@ routeI.get('/:id', ctx => {
   return 'post id:' + ctx.req.params.id
 })
 
+routeI.get('/:id/from/:user', ctx => {
+  const { id, user } = ctx.req.params
+  return 'id:' + id + ' user:' + user
+})
+
 routeII.get('/get', () => {
   return 'routeII get'
 })
@@ -78,6 +83,7 @@ const main = async () => {
 
     // // :params
     await t('/posts/1234', 'post id:1234')
+    await t('/posts/1234/from/yannick', 'id:1234 user:yannick')
 
     console.log('TEST RESULT:')
     tests.forEach(t => {

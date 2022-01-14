@@ -25,6 +25,8 @@ export class TinyServerHttp extends TinyServerBase<HttpServer, Request, Response
         const req = _req as Request
         const res = _res as Response
 
+        // console.log('/* NEW REQUEST */')
+
         const result = (await this.router.handle(req, res)) as any
 
         // notfound/error

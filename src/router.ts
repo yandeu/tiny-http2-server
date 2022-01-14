@@ -79,8 +79,10 @@ export class Router {
         // if has params, convert to RegEx
         if (typeof route !== 'function' && typeof route.path === 'string' && route.path.includes('/:')) {
           try {
+            console.log('route.path', route.path)
             route.path = route.path.replace('/', '\\/')
-            route.path = route.path.replace(/\/:([^/]+)/gm, '\\/(?<$1>[^\\/]+)')
+            // route.path = route.path.replace(/\/:([^/]+)/gm, '\\/(?<$1>[^\\/]+)')
+            route.path = route.path.replace(/\/:([^/]+)/gm, '/(?<$1>[^\\/]+)')
             route.path = new RegExp(`^${route.path}$`, 'gm')
           } catch (err: any) {
             console.log('WARNING:', err.message)
@@ -93,24 +95,59 @@ export class Router {
 
   async handle(req: Request, res: Response) {
     const method = req.method?.toLowerCase() as Method
-    let url =
-      this._absoluteRoot === '/' ? (req.url as string) : req.url.replace(new RegExp(`^${this._absoluteRoot}`), '')
-    if (url === '') url = '/'
+
+    const RouterPathRel = this._relativeRoot
+    const RouterPathAbs = this._absoluteRoot
+
+    const url = req.url
+
+    // let path =
+    //   this._absoluteRoot === '/' ? (req.url as string) : req.url.replace(new RegExp(`^${this._absoluteRoot}`), '')
+    // if (path === '') path = '/'
+    let fullPath
+
+    console.log({
+      RouterPathRel,
+      RouterPathAbs,
+      url
+      // path
+    })
 
     routesLoop: for (let i = 0; i < this._routes.length; i++) {
+      console.log('->')
       if (res.headersSent) break routesLoop
 
       const route = this._routes[i]
 
       if (route instanceof Router) {
-        await route.handle(req, res)
+        console.log('isRouter')
+
+        console.log(req.url, req.url.startsWith(route._absoluteRoot), route._absoluteRoot)
+        if (req.url.startsWith(route._absoluteRoot)) {
+          await route.handle(req, res)
+        }
         continue
       }
 
+      // @ts-ignore
+      fullPath = (RouterPathAbs + route.path).replace(/\/+/gm, '/').replace(/\/$/, '')
+      if (fullPath.length === 0) fullPath = '/'
+      // @ts-ignore
+      console.log('isRoute', route.path)
+      console.log('fullPath', fullPath)
+
       const pathIsAsterisk = typeof route !== 'function' && route.path === '*'
       const pathIsRegex = typeof route !== 'function' && route.path instanceof RegExp // && url.match(route.path) !== null
-      const pathIsExact = typeof route !== 'function' && route.path === url
+
+      const pathIsExact = typeof route !== 'function' && fullPath === url
       const pathMatches = typeof route !== 'function' && typeof route.path === 'string' && url.startsWith(route.path)
+
+      // adjust full path if is regex
+
+      if (pathIsAsterisk) console.log('pathIsAsterisk', pathIsAsterisk)
+      if (pathIsRegex) console.log('pathIsRegex', pathIsRegex)
+      if (pathIsExact) console.log('pathIsExact', pathIsExact)
+      if (pathMatches) console.log('pathMatches', pathMatches)
 
       // is handle without path
       if (typeof route === 'function') {
@@ -138,19 +175,24 @@ export class Router {
         else if (pathIsAsterisk || pathIsExact || pathIsRegex) {
           // get all regex capture groups and pass them as params to req.params
           if (pathIsRegex) {
-            //const array = [...req.url.matchAll(route.path as RegExp)]
-            const matchesIterator = url.matchAll(route.path as RegExp)
+            // adjust fullPath
+
+            const p = url.replace(new RegExp(`^${RouterPathAbs}`), '')
+
+            // const matchesIterator = url.matchAll(route.path as RegExp)
+            const matchesIterator = p.matchAll(route.path as any)
             const matches = Array.from(matchesIterator)
 
             if (matches.length === 0) continue
 
             for (const match of matches) {
-              req.params = { ...match.groups }
+              req.params = { ...req.params, ...match.groups }
             }
           }
 
           if (route.method === method || route.method === 'any') {
             const result = await (route.handler as Handler)({ req, res })
+            console.log('result:', result)
             if (typeof result === 'string') return res.send.text(result)
             // TODO(yandeu): Only use sendStatus() if number is one of status code.
             else if (typeof result === 'number') return res.send.status(result)

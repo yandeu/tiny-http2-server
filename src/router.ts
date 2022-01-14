@@ -4,6 +4,8 @@ import { Request } from './request'
 import { Response } from './response'
 import type { ExpressHandler, Handler, Method, Path, Route, Routes, UseMiddleware } from './types'
 
+const DEBUG = false
+
 export class Router {
   /** The root route of this Router */
   private _relativeRoot = '/'
@@ -79,7 +81,7 @@ export class Router {
         // if has params, convert to RegEx
         if (typeof route !== 'function' && typeof route.path === 'string' && route.path.includes('/:')) {
           try {
-            console.log('route.path', route.path)
+            if (DEBUG) console.log('route.path', route.path)
             route.path = route.path.replace('/', '\\/')
             // route.path = route.path.replace(/\/:([^/]+)/gm, '\\/(?<$1>[^\\/]+)')
             route.path = route.path.replace(/\/:([^/]+)/gm, '/(?<$1>[^\\/]+)')
@@ -106,23 +108,24 @@ export class Router {
     // if (path === '') path = '/'
     let fullPath
 
-    console.log({
-      RouterPathRel,
-      RouterPathAbs,
-      url
-      // path
-    })
+    if (DEBUG)
+      console.log({
+        RouterPathRel,
+        RouterPathAbs,
+        url
+        // path
+      })
 
     routesLoop: for (let i = 0; i < this._routes.length; i++) {
-      console.log('->')
+      if (DEBUG) console.log('->')
       if (res.headersSent) break routesLoop
 
       const route = this._routes[i]
 
       if (route instanceof Router) {
-        console.log('isRouter')
+        if (DEBUG) console.log('isRouter')
 
-        console.log(req.url, req.url.startsWith(route._absoluteRoot), route._absoluteRoot)
+        if (DEBUG) console.log(req.url, req.url.startsWith(route._absoluteRoot), route._absoluteRoot)
         if (req.url.startsWith(route._absoluteRoot)) {
           await route.handle(req, res)
         }
@@ -133,8 +136,8 @@ export class Router {
       fullPath = (RouterPathAbs + route.path).replace(/\/+/gm, '/').replace(/\/$/, '')
       if (fullPath.length === 0) fullPath = '/'
       // @ts-ignore
-      console.log('isRoute', route.path)
-      console.log('fullPath', fullPath)
+      if (DEBUG) console.log('isRoute', route.path)
+      if (DEBUG) console.log('fullPath', fullPath)
 
       const pathIsAsterisk = typeof route !== 'function' && route.path === '*'
       const pathIsRegex = typeof route !== 'function' && route.path instanceof RegExp // && url.match(route.path) !== null
@@ -143,11 +146,12 @@ export class Router {
       const pathMatches = typeof route !== 'function' && typeof route.path === 'string' && url.startsWith(route.path)
 
       // adjust full path if is regex
-
-      if (pathIsAsterisk) console.log('pathIsAsterisk', pathIsAsterisk)
-      if (pathIsRegex) console.log('pathIsRegex', pathIsRegex)
-      if (pathIsExact) console.log('pathIsExact', pathIsExact)
-      if (pathMatches) console.log('pathMatches', pathMatches)
+      if (DEBUG) {
+        if (pathIsAsterisk) console.log('pathIsAsterisk', pathIsAsterisk)
+        if (pathIsRegex) console.log('pathIsRegex', pathIsRegex)
+        if (pathIsExact) console.log('pathIsExact', pathIsExact)
+        if (pathMatches) console.log('pathMatches', pathMatches)
+      }
 
       // is handle without path
       if (typeof route === 'function') {
@@ -192,7 +196,7 @@ export class Router {
 
           if (route.method === method || route.method === 'any') {
             const result = await (route.handler as Handler)({ req, res })
-            console.log('result:', result)
+            if (DEBUG) console.log('result:', result)
             if (typeof result === 'string') return res.send.text(result)
             // TODO(yandeu): Only use sendStatus() if number is one of status code.
             else if (typeof result === 'number') return res.send.status(result)

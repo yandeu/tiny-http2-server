@@ -7,8 +7,9 @@ import type { ExpressHandler, Handler, Method, Path, Route, Routes, UseMiddlewar
 const DEBUG = false
 
 export class Router {
-  /** The root route of this Router */
+  /** The relative root route of this Router */
   private _relativeRoot = '/'
+  /** The absolute root route of this Router */
   private _absoluteRoot = '/'
   /** Array of all routes of this Router */
   private _routes: Routes = []
@@ -97,6 +98,8 @@ export class Router {
 
   async handle(req: Request, res: Response) {
     const method = req.method?.toLowerCase() as Method
+    // let url = this._absoluteRoot === '/' ? req.url : req.url.replace(new RegExp(`^${this._absoluteRoot}`), '/')
+    // url = url.replace(/\/+/gm, '/')
 
     const RouterPathRel = this._relativeRoot
     const RouterPathAbs = this._absoluteRoot

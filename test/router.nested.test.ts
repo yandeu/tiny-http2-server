@@ -2,7 +2,7 @@ import { TinyServerHttp, Router } from '../lib/index.js'
 import { nodeFetch } from '../scripts/nodeFetch.js'
 import { describe, expect, test, errors } from './test.mjs'
 
-describe('Http', async () => {
+describe('Nested Router', async () => {
   const server = new TinyServerHttp()
   const route = server.route
 

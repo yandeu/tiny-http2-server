@@ -11,6 +11,7 @@ export type Method = 'any' | 'get' | 'patch' | 'post' | 'put' | 'delete'
 export type Context = {
   req: Request
   res: Response
+  next: NextFunction
 }
 export interface NextFunction {
   (err?: any): void

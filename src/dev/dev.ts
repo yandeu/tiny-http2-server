@@ -5,8 +5,8 @@
 import { createServer } from 'http'
 import { join, resolve } from 'path'
 
-import { TinyServerHttp2, serveExplorer, bodyParser, logger } from './'
-import { nodeFetch } from '../scripts/nodeFetch'
+import { TinyServerHttp2, serveExplorer, bodyParser, logger } from '../'
+import { nodeFetch } from '../../scripts/nodeFetch'
 
 const httpsRedirect = () => {
   const httpsRedirect = createServer((req, res) => {
